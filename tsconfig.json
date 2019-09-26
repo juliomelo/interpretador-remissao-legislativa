@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin",
+        "alwaysShowRuleFailuresAsWarnings": false,
+        "ignoreDefinitionFiles": true,
+        "configFile": "tslint.json",
+        "suppressWhileTypeErrorsPresent": false
+      }
+    ],
+    "types": ["jest"]
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

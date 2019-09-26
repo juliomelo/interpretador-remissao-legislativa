@@ -1,0 +1,17 @@
+{
+  "name": "@legispedia/interpretador-remissao-legislativa",
+  "version": "1.0.0",
+  "description": "Interpretador de Remissão Legislativa",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx jest"
+  },
+  "author": "Júlio César e Melo",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.2"
+  }
+}

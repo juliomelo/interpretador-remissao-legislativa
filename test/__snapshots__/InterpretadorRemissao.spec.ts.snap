@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InterpretadorRemissao Deve interpretar lei 1`] = `
+Array [
+  Object {
+    "idx": 22,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 1975,
+        "numero": 6763,
+        "tipo": Object {
+          "ambito": "Minas Gerais",
+          "sigla": "LEI",
+          "tipo": "Lei",
+        },
+      },
+      "texto": "Lei nº 6.763, de 26 de dezembro de 1975",
+    },
+  },
+]
+`;
