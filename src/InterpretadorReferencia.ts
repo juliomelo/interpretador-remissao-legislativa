@@ -62,9 +62,10 @@ export default class InterpretadorReferencia {
 
     public *interpretarReverso(entrada: string, idx: number): IterableIterator<IReferenciaEncontrada> {
         const espaco = /\s/;
-        const final = /[.:;!?()[\]]{}'"\u2018\u2019\u201C\u201D/;
+        const final = /[.:;!?()[\]{}'"\u2018\u2019\u201C\u201D]/;
         let atravessador = this.interpretador.criarAtravessador();
         let letra: string;
+        let finalizado = false;
 
         do {
             letra = entrada.charAt(idx);
@@ -81,10 +82,11 @@ export default class InterpretadorReferencia {
                 atravessador = this.interpretador.criarAtravessador();
             } else {
                 atravessador.caminhar(letra);
+                finalizado = final.test(letra);
             }
 
             idx--;
-        } while (idx >= 0 && !final.test(letra));
+        } while (idx >= 0 && !(finalizado && !atravessador.noAtual));
     }
 
     private inverter(termo: string) {
