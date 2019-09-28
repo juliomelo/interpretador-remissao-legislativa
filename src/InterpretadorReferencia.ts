@@ -6,58 +6,51 @@ export default class InterpretadorReferencia {
     constructor() {
         const partes: {
             tipo: TipoReferencia,
-            expressao: string[],
-            numerado: boolean
+            expressao: string[]
         }[] = [
                 {
                     tipo: TipoReferencia.ARTIGO,
-                    expressao: ['art', 'art.', 'artigo'],
-                    numerado: true
+                    expressao: ['art', 'art.', 'artigo']
                 },
                 {
                     tipo: TipoReferencia.CAPUT,
-                    expressao: ['caput'],
-                    numerado: false
+                    expressao: ['caput']
+                },
+                {
+                    tipo: TipoReferencia.PARAGRAFO,
+                    expressao: ['parágrafo', 'paragrafo', '§', 'parág.', 'parag.']
                 },
                 {
                     tipo: TipoReferencia.INCISO,
-                    expressao: ['inc', 'inc.', 'inciso'],
-                    numerado: true
+                    expressao: ['inc', 'inc.', 'inciso']
                 },
                 {
                     tipo: TipoReferencia.ALINEA,
-                    expressao: ['ali', 'ali.', 'alínea', 'alinea'],
-                    numerado: true
+                    expressao: ['ali', 'ali.', 'alínea', 'alinea']
                 },
                 {
                     tipo: TipoReferencia.ITEM,
-                    expressao: ['ite', 'item'],
-                    numerado: true
+                    expressao: ['ite', 'item']
                 },
                 {
                     tipo: TipoReferencia.SUBSECAO,
-                    expressao: ['subseção', 'subsecao', 'subsec', 'subsec.'],
-                    numerado: true
+                    expressao: ['subseção', 'subsecao', 'subsec', 'subsec.']
                 },
                 {
                     tipo: TipoReferencia.SECAO,
-                    expressao: ['secao', 'sec.', 'sec'],
-                    numerado: true
+                    expressao: ['secao', 'sec.', 'sec']
                 },
                 {
                     tipo: TipoReferencia.CAPITULO,
-                    expressao: ['capítulo', 'capitulo', 'cap.', 'cap'],
-                    numerado: true
+                    expressao: ['capítulo', 'capitulo', 'cap.', 'cap']
                 },
                 {
                     tipo: TipoReferencia.TITULO,
-                    expressao: ['título', 'titulo', 'tit.', 'tit'],
-                    numerado: true
+                    expressao: ['título', 'titulo', 'tit.', 'tit']
                 },
                 {
                     tipo: TipoReferencia.PREAMBULO,
-                    expressao: ['preambulo', 'preâmbulo', 'pré-âmbulo', 'pre-ambulo', 'préâmbulo', 'préambulo'],
-                    numerado: true
+                    expressao: ['preambulo', 'preâmbulo', 'pré-âmbulo', 'pre-ambulo', 'préâmbulo', 'préambulo']
                 }
             ];
 
