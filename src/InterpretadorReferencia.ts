@@ -2,6 +2,7 @@ import { InterpretadorMultiplo } from './interpretadorMultiplo/InterpretadorMult
 
 export default class InterpretadorReferencia {
     private readonly interpretador = new InterpretadorMultiplo<TipoReferencia>();
+    private readonly limiteDesencontros = 4;
 
     constructor() {
         const partes: {
@@ -61,32 +62,50 @@ export default class InterpretadorReferencia {
     }
 
     public *interpretarReverso(entrada: string, idx: number): IterableIterator<IReferenciaEncontrada> {
-        const espaco = /\s/;
-        const final = /[.:;!?()[\]{}'"\u2018\u2019\u201C\u201D]/;
+        const espaco = /\s|,/;
+        const final = /[.:;!?()[\]{}]/;
         let atravessador = this.interpretador.criarAtravessador();
         let letra: string;
         let finalizado = false;
+        let desencontros = 0;
+
+        while (idx >= 0 && espaco.test(entrada.charAt(idx))) {
+            idx--;
+        }
 
         do {
             letra = entrada.charAt(idx);
 
-            if (espaco.test(letra)) {
+            if (espaco.test(letra) || final.test(letra)) {
+                // Se temos um nó atual, então é um casamento!
                 if (atravessador.noAtual && atravessador.noAtual.item) {
                     yield {
                         tipo: atravessador.noAtual.item!,
                         idx: idx + 1,
                         tamanho: atravessador.contador
                     };
-                }
 
-                atravessador = this.interpretador.criarAtravessador();
+                    finalizado = false;
+                    desencontros = 0;
+                    atravessador = this.interpretador.criarAtravessador();
+                } else if (!!atravessador.caminhar(letra)) {
+                    // É um finalizador!
+                    finalizado = true;
+                    idx--;
+                } else {
+                    desencontros++;
+                    atravessador = this.interpretador.criarAtravessador();
+
+                    do {
+                        finalizado = finalizado || final.test(entrada.charAt(idx));
+                        idx--;
+                    } while (idx >= 0 && espaco.test(entrada.charAt(idx)));
+                }
             } else {
                 atravessador.caminhar(letra);
-                finalizado = final.test(letra);
+                idx--;
             }
-
-            idx--;
-        } while (idx >= 0 && !(finalizado && !atravessador.noAtual));
+        } while (idx >= 0 && !(finalizado && !atravessador.noAtual) && this.limiteDesencontros >= desencontros);
     }
 
     private inverter(termo: string) {

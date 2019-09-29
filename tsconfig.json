@@ -14,8 +14,7 @@
         "configFile": "tslint.json",
         "suppressWhileTypeErrorsPresent": false
       }
-    ],
-    "types": ["jest"]
+    ]
   },
   "include": [
     "src/**/*.ts"

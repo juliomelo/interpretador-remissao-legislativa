@@ -1,14 +1,33 @@
+import {readFileSync} from 'fs';
 import InterpretadorRemissao from '../src/InterpretadorRemissao';
 import minasGerais from '../src/tiposNormas/minasGerais';
 
 describe('InterpretadorRemissao', () => {
-    const interpretador = new InterpretadorRemissao(minasGerais);
+    const interpretador = new InterpretadorRemissao([...minasGerais, {
+        ambito: 'Federal',
+        tipo: 'Lei Federal',
+        sigla: 'LF'
+    }]);
+
+    function testar(entrada: string) {
+        expect(interpretador.interpretar(entrada)).toMatchSnapshot();
+    }
 
     it('Deve interpretar lei', () => {
         // tslint:disable-next-line: max-line-length
-        const texto = 'O § 6º do art. 225 da Lei nº 6.763, de 26 de dezembro de 1975, passa a vigorar com a seguinte redação:';
+        testar('O § 6º do art. 225 da Lei nº 6.763, de 26 de dezembro de 1975, passa a vigorar com a seguinte redação:');
+    });
+
+    it('Não deve confundir referência de artigos entre diferentes períodos.', () => {
+        // tslint:disable-next-line: max-line-length
+        const texto = 'Testando o art. 225. Veja a Lei nº 6.763, de 26 de dezembro de 1975.';
         const resultado = interpretador.interpretar(texto);
 
-        expect(resultado).toMatchSnapshot();
+        expect(resultado[0].remissao.referencia).toBe(undefined);
     });
-});
+
+    it('Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019', () => {
+        // tslint:disable-next-line: max-line-length
+        testar('o disposto na alínea “b” do inciso VII do art. 3º e no § 3º do art. 14, ambos da Lei Federal nº 11.428, de 22 de dezembro de 2006,');
+    });
+})

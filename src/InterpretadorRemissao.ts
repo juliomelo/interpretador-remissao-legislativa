@@ -17,6 +17,38 @@ export default class InterpretadorRemissao {
     private interpretadorDispositivo = new InterpretadorReferencia();
 
     constructor(normas: ITipoNorma[]) {
+        normas = [
+            {
+                ambito: 'Federal',
+                tipo: 'Constituição Federal',
+                sigla: 'CF',
+                semNumero: true
+            },
+            {
+                ambito: 'Federal',
+                tipo: 'Constituição da República Federativa do Brasil',
+                sigla: 'CRFB',
+                semNumero: true
+            },
+            {
+                ambito: 'Estadual',
+                tipo: 'Constituição do Estado',
+                sigla: 'CE',
+                semNumero: true
+            },
+            {
+                ambito: 'Federal',
+                tipo: 'Constituição Estadual',
+                sigla: 'CE',
+                semNumero: true
+            },
+            {
+                ambito: 'Municipal',
+                tipo: 'Lei Orgânica',
+                sigla: 'LO',
+                semNumero: true
+            },
+            ...normas];
         this.hashNormas = new Map();
 
         for (const norma of normas) {
@@ -24,14 +56,19 @@ export default class InterpretadorRemissao {
             this.hashNormas.set(norma.sigla.trim().toLocaleLowerCase(), norma);
         }
 
+        const regexpInicio = '(^|\\s|[.:;,!?()[\\]{}`´"\'\u2018\u2019\u201C\u201D])';
+        const regexpNormas = '(' +
+            normas.map(norma => norma.tipo.trim().replace(/\s+/g, '\\s+'))
+                .concat(normas.map(norma => norma.sigla.trim()))
+                .sort((a, b) => b.length - a.length)
+                .join('|') + ')';
         const regexpNumero = '(?:(?:n[º.]?|n[uú]mero|n[uú]m\\.)\\s*)?(\\d+(?:\\.\\d{3})+)';
         const regexpDiaMes = '\\s*de\\s*\\d+\\s*de(?:\\s*\\d+\\s*|\\s+\\S+\\s+)de\\s*';
-        const regexpAno = `(?:(?:\\s*?de\\s*?|[/-:]|,?${regexpDiaMes}|\\s+)(\\d+))`;
+        const regexpAno = `(?:(?:[/-:]|,?${regexpDiaMes}|,?\\s*?de\\s*?|\\s+)(\\d+)(?!\\s*de\\s*\\S+\\s*de\\s*\\d+))`;
+        const regexpFinal = '($|\\s|[.:;,!?()[\\]{}`´"\'\u2018\u2019\u201C\u201D])';
 
-        this.regexp = new RegExp(`(${
-            normas.map(norma => norma.tipo.trim())
-                .concat(normas.map(norma => norma.sigla.trim())).join('|')
-            })\\s*${regexpNumero}${regexpAno}?`, 'ig');
+        // tslint:disable-next-line: max-line-length
+        this.regexp = new RegExp(`${regexpInicio}${regexpNormas}(?:\\s*${regexpNumero}${regexpAno}?)?${regexpFinal}`, 'ig');
     }
 
     public interpretar(entrada: string): IInterpretacaoRemissao[] {
@@ -46,30 +83,53 @@ export default class InterpretadorRemissao {
         const resultado: IInterpretacaoRemissao[] = [];
 
         for (let m = this.regexp.exec(entrada); m; m = this.regexp.exec(entrada)) {
-            resultado.push({
-                idx: m.index,
-                remissao: {
-                    texto: m[0],
-                    identificador: {
-                        tipo: this.hashNormas.get(m[1].trim().toLowerCase())!,
-                        numero: parseInt(m[2].replace(/\./g, ''), 10),
-                        ano: parseInt(m[3], 10)
+            const tipo = this.hashNormas.get(m[2].trim().toLowerCase())!;
+            const idx = m.index + m[1].length;
+            const texto = m[0].substr(m[1].length, m[0].length - m[1].length - m[5].length);
+
+            if (m[3]) {
+                resultado.push({
+                    idx,
+                    remissao: {
+                        texto,
+                        identificador: {
+                            tipo,
+                            numero: parseInt(m[3].replace(/\./g, ''), 10),
+                            ano: parseInt(m[4], 10)
+                        }
                     }
-                }
-            });
+                });
+            } else if (tipo.semNumero) {
+                resultado.push({
+                    idx,
+                    remissao: {
+                        texto,
+                        identificador: {
+                            tipo
+                        }
+                    }
+                });
+            }
         }
 
         return resultado;
     }
 
     private interpretarRemissaoDispositivos(entrada: string, remissao: IInterpretacaoRemissao): void {
-        const idx = remissao.idx;
+        let idx = remissao.idx - 1;
+
+        if (idx < 0) {
+            return;
+        }
+
         const referencia: IReferencia = {};
         let inicio = idx;
 
         for (const item of this.interpretadorDispositivo.interpretarReverso(entrada, idx)) {
             if (item.tipo in referencia) {
-                throw new Error(`Referência repetida: ${item.tipo}.`);
+                console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
+                this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, idx - inicio + 1);
+                idx = inicio - 1;
             }
 
             referencia[item.tipo] = item;
@@ -77,17 +137,29 @@ export default class InterpretadorRemissao {
         }
 
         if (inicio !== idx) {
-            remissao.remissao.referencia = {
-                artigo: this.extrairNumero(entrada, referencia[TipoReferencia.ARTIGO]),
-                paragrafo: this.extrairNumero(entrada, referencia[TipoReferencia.PARAGRAFO], false),
-                // tslint:disable-next-line: max-line-length
-                inciso: this.extrairNumero(entrada, referencia[TipoReferencia.INCISO], TipoReferencia.ALINEA in referencia),
-                // tslint:disable-next-line: max-line-length
-                alinea: this.extrairNumero(entrada, referencia[TipoReferencia.ALINEA], TipoReferencia.ITEM in referencia),
-                item: this.extrairNumero(entrada, referencia[TipoReferencia.ITEM], false),
-                texto: entrada.substr(inicio, idx - inicio)
-            } as IReferenciaItem;
+            this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, idx - inicio + 1);
         }
+    }
+
+    private incorporarReferencia(remissao: IRemissao,
+                                 referencia: IReferencia,
+                                 entrada: string,
+                                 inicio: number,
+                                 tamanho: number) {
+        if (!remissao.referencia) {
+            remissao.referencia = [];
+        }
+
+        remissao.referencia.unshift({
+            artigo: this.extrairNumero(entrada, referencia[TipoReferencia.ARTIGO]),
+            paragrafo: this.extrairNumero(entrada, referencia[TipoReferencia.PARAGRAFO], false),
+            // tslint:disable-next-line: max-line-length
+            inciso: this.extrairNumero(entrada, referencia[TipoReferencia.INCISO], TipoReferencia.ALINEA in referencia),
+            // tslint:disable-next-line: max-line-length
+            alinea: this.extrairNumero(entrada, referencia[TipoReferencia.ALINEA], TipoReferencia.ITEM in referencia),
+            item: this.extrairNumero(entrada, referencia[TipoReferencia.ITEM], false),
+            texto: entrada.substr(inicio, tamanho)
+        } as IReferenciaItem);
     }
 
     private extrairNumero(entrada: string,
@@ -101,7 +173,7 @@ export default class InterpretadorRemissao {
             return undefined;
         }
 
-        const espaco = /\s/;
+        const espaco = /\s|,/;
         let idx = referencia.idx + referencia.tamanho;
 
         while (idx < entrada.length && espaco.test(entrada.charAt(idx))) {
@@ -121,7 +193,7 @@ export default class InterpretadorRemissao {
 
             return undefined;
         } else {
-            return entrada.substr(idx, ultimoIdx - idx);
+            return entrada.substr(idx, ultimoIdx - idx).replace(/[\u2018\u2019\u201C\u201D'"]/g, '');
         }
     }
 }
