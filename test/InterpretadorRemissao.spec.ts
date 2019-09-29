@@ -27,7 +27,6 @@ describe('InterpretadorRemissao', () => {
     });
 
     it('Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019', () => {
-        // tslint:disable-next-line: max-line-length
-        testar('o disposto na alínea “b” do inciso VII do art. 3º e no § 3º do art. 14, ambos da Lei Federal nº 11.428, de 22 de dezembro de 2006,');
+        testar(readFileSync('test/minas_gerais-decreto_com_numeracao_especial_471_2019.txt').toString());
     });
 })
