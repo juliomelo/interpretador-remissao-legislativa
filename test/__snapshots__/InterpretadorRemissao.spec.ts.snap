@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`InterpretadorRemissao Deve interpretar lei 1`] = `
+exports[`InterpretadorRemissao Deve interpretar lei: Interpretador Padrão 1`] = `
 Array [
   Object {
     "idx": 22,
@@ -30,7 +30,37 @@ Array [
 ]
 `;
 
-exports[`InterpretadorRemissao Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019 1`] = `
+exports[`InterpretadorRemissao Deve interpretar lei: Interpretador Segmentado 1`] = `
+Array [
+  Object {
+    "idx": 22,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 1975,
+        "numero": 6763,
+        "tipo": Object {
+          "ambito": "Minas Gerais",
+          "sigla": "LEI",
+          "tipo": "Lei",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": undefined,
+          "artigo": "225",
+          "inciso": undefined,
+          "item": undefined,
+          "paragrafo": "6º",
+          "texto": "§ 6º do art. 225",
+        },
+      ],
+      "texto": "Lei nº 6.763, de 26 de dezembro de 1975",
+    },
+  },
+]
+`;
+
+exports[`InterpretadorRemissao Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019: Interpretador Padrão 1`] = `
 Array [
   Object {
     "idx": 95,
@@ -159,6 +189,143 @@ Array [
           "item": undefined,
           "paragrafo": "3º",
           "texto": "§ 3º do art. 14 da ",
+        },
+      ],
+      "texto": "Lei Federal nº 11.428, de 2006",
+    },
+  },
+]
+`;
+
+exports[`InterpretadorRemissao Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019: Interpretador Segmentado 1`] = `
+Array [
+  Object {
+    "idx": 95,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 2006,
+        "numero": 11428,
+        "tipo": Object {
+          "ambito": "Federal",
+          "sigla": "LF",
+          "tipo": "Lei Federal",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": "b",
+          "artigo": "3º",
+          "inciso": "VII",
+          "item": undefined,
+          "paragrafo": undefined,
+          "texto": "alínea “b” do inciso VII do art. 3º",
+        },
+      ],
+      "texto": "Lei Federal nº 11.428, de 22 de dezembro de 2006",
+    },
+  },
+  Object {
+    "idx": 399,
+    "remissao": Object {
+      "identificador": Object {
+        "tipo": Object {
+          "ambito": "Estadual",
+          "semNumero": true,
+          "sigla": "CE",
+          "tipo": "Constituição do Estado",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": undefined,
+          "artigo": "90",
+          "inciso": "VII",
+          "item": undefined,
+          "paragrafo": undefined,
+          "texto": "inciso VII do art. 90",
+        },
+      ],
+      "texto": "Constituição do Estado",
+    },
+  },
+  Object {
+    "idx": 520,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 2006,
+        "numero": 11428,
+        "tipo": Object {
+          "ambito": "Federal",
+          "sigla": "LF",
+          "tipo": "Lei Federal",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": "b",
+          "artigo": "3º",
+          "inciso": "VII",
+          "item": undefined,
+          "paragrafo": "3º",
+          "texto": "alínea “b” do inciso VII do art. 3º",
+        },
+        Object {
+          "alinea": undefined,
+          "artigo": "14",
+          "inciso": undefined,
+          "item": undefined,
+          "paragrafo": "3º",
+          "texto": "§ 3º do art. 14,",
+        },
+      ],
+      "texto": "Lei Federal nº 11.428, de 22 de dezembro de 2006",
+    },
+  },
+  Object {
+    "idx": 697,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 2006,
+        "numero": 11428,
+        "tipo": Object {
+          "ambito": "Federal",
+          "sigla": "LF",
+          "tipo": "Lei Federal",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": "b",
+          "artigo": "3º",
+          "inciso": "VII",
+          "item": undefined,
+          "paragrafo": undefined,
+          "texto": "alínea “b” do inciso VII do art. 3º",
+        },
+      ],
+      "texto": "Lei Federal nº 11.428, de 22 de dezembro de 2006",
+    },
+  },
+  Object {
+    "idx": 1172,
+    "remissao": Object {
+      "identificador": Object {
+        "ano": 2006,
+        "numero": 11428,
+        "tipo": Object {
+          "ambito": "Federal",
+          "sigla": "LF",
+          "tipo": "Lei Federal",
+        },
+      },
+      "referencia": Array [
+        Object {
+          "alinea": undefined,
+          "artigo": "14",
+          "inciso": undefined,
+          "item": undefined,
+          "paragrafo": "3º",
+          "texto": "§ 3º do art. 14",
         },
       ],
       "texto": "Lei Federal nº 11.428, de 2006",

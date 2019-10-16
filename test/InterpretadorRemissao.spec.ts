@@ -1,16 +1,19 @@
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 import InterpretadorRemissao from '../src/InterpretadorRemissao';
 import minasGerais from '../src/tiposNormas/minasGerais';
 
 describe('InterpretadorRemissao', () => {
-    const interpretador = new InterpretadorRemissao([...minasGerais, {
+    const normas = [...minasGerais, {
         ambito: 'Federal',
         tipo: 'Lei Federal',
         sigla: 'LF'
-    }]);
+    }];
+    const interpretador = new InterpretadorRemissao(normas);
+    const interpretadorSegmentado = new InterpretadorRemissao(normas, { segmentarDispositivo: true });
 
     function testar(entrada: string) {
-        expect(interpretador.interpretar(entrada)).toMatchSnapshot();
+        expect(interpretador.interpretar(entrada)).toMatchSnapshot('Interpretador Padrão');
+        expect(interpretadorSegmentado.interpretar(entrada)).toMatchSnapshot('Interpretador Segmentado');
     }
 
     it('Deve interpretar lei', () => {
@@ -29,4 +32,4 @@ describe('InterpretadorRemissao', () => {
     it('Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019', () => {
         testar(readFileSync('test/minas_gerais-decreto_com_numeracao_especial_471_2019.txt').toString());
     });
-})
+});

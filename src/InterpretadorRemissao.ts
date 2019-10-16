@@ -11,12 +11,16 @@ export interface IReferencia {
     [tipo: string]: IReferenciaEncontrada;
 }
 
+export interface IInterpretadorRemissaoOpcoes {
+    segmentarDispositivo?: boolean;
+}
+
 export default class InterpretadorRemissao {
     private hashNormas: Map<string, ITipoNorma>;
     private regexp: RegExp;
     private interpretadorDispositivo = new InterpretadorReferencia();
 
-    constructor(normas: ITipoNorma[]) {
+    constructor(normas: ITipoNorma[], private opcoes: IInterpretadorRemissaoOpcoes = {}) {
         normas = [
             {
                 ambito: 'Federal',
@@ -124,20 +128,29 @@ export default class InterpretadorRemissao {
 
         const referencia: IReferencia = {};
         let inicio = idx;
+        let final = -1;
 
         for (const item of this.interpretadorDispositivo.interpretarReverso(entrada, idx)) {
             if (item.tipo in referencia) {
                 console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
-                this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, idx - inicio + 1);
+                const tamanho = this.opcoes.segmentarDispositivo
+                    ? entrada.indexOf(' ', final + 1) - inicio
+                    : idx - inicio + 1;
+                this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, tamanho);
                 idx = inicio - 1;
+                final = -1;
             }
 
             referencia[item.tipo] = item;
             inicio = Math.min(inicio, item.idx);
+            final = Math.max(final, item.idx + item.tamanho);
         }
 
         if (inicio !== idx) {
-            this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, idx - inicio + 1);
+            const tamanho = this.opcoes.segmentarDispositivo
+                    ? entrada.indexOf(' ', final + 1) - inicio
+                    : idx - inicio + 1;
+            this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, tamanho);
         }
     }
 
