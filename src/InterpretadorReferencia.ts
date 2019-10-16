@@ -1,7 +1,19 @@
 import { InterpretadorMultiplo } from './interpretadorMultiplo/InterpretadorMultiplo';
 
+/**
+ * Interpreta referência de dispositivo.
+ *
+ * @author Júlio César e Melo
+ */
 export default class InterpretadorReferencia {
     private readonly interpretador = new InterpretadorMultiplo<TipoReferencia>();
+
+    /**
+     * Determina o limite de termos desconhecidos antes de interromper a
+     * interpretação de referência. Pode ser entendido também como a distância
+     * máxima (em número de termos), em que a referência ao dispositivo se
+     * encontra, da citação à norma.
+     */
     private readonly limiteDesencontros = 4;
 
     constructor() {
@@ -61,6 +73,18 @@ export default class InterpretadorReferencia {
         });
     }
 
+    /**
+     * Realiza interpretação reversa (de trás para frente) do texto,
+     * em busca de referência de dispositivos.
+     *
+     * A interpretação reversa permite um melhor desempenho em idenficiação de
+     * referências a partir da identificação de uma remissão de norma no mesmo texto.
+     * Para tanto, basta fornecer como índice (parâmetro idx) a posição exata
+     * da remissão para a norma no texto.
+     *
+     * @param entrada Texto de cuja referência será extraída.
+     * @param idx Índice do texto de onde a interpretação iniciará.
+     */
     public *interpretarReverso(entrada: string, idx: number): IterableIterator<IReferenciaEncontrada> {
         const espaco = /\s|,/;
         const final = /[.:;!?()[\]{}]/;
@@ -108,6 +132,11 @@ export default class InterpretadorReferencia {
         } while (idx >= 0 && !(finalizado && !atravessador.noAtual) && this.limiteDesencontros >= desencontros);
     }
 
+    /**
+     * Inverte um literal.
+     *
+     * @param termo Literal a ser invertido.
+     */
     private inverter(termo: string) {
         let resultado = '';
 
@@ -133,6 +162,11 @@ export enum TipoReferencia {
     PREAMBULO = 'preambulo'
 }
 
+/**
+ * Resultado da interpretação de referência.
+ *
+ * @author Júlio César e Melo
+ */
 export interface IReferenciaEncontrada {
     tipo: TipoReferencia;
     idx: number;

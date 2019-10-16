@@ -2,24 +2,67 @@ import InterpretadorReferencia, { IReferenciaEncontrada, TipoReferencia } from '
 import IRemissao, { IReferenciaItem } from './IRemissao';
 import ITipoNorma from './ITipoNorma';
 
+/**
+ * Resultado da interpretação da remissão.
+ */
 export interface IInterpretacaoRemissao {
+    /**
+     * Índice da remissão no texto.
+     */
     idx: number;
+
+    /**
+     * Remissão identificada.
+     */
     remissao: IRemissao;
 }
 
+/**
+ * Índice de referências de dispositivos organizados por tipo de dispositivo.
+ */
 export interface IReferencia {
     [tipo: string]: IReferenciaEncontrada;
 }
 
+/**
+ * Opções para interpretação.
+ */
 export interface IInterpretadorRemissaoOpcoes {
+    /**
+     * Determina se a interpretação deve extrair apenas o segmento que
+     * referencia o dispositivo (segmentarDispositivo: true) ou extrair
+     * todo o texto até a remissão (padrão).
+     */
     segmentarDispositivo?: boolean;
 }
 
+/**
+ * Interpreta remissão a normas.
+ *
+ * @author Júlio César e Melo
+ */
 export default class InterpretadorRemissao {
-    private hashNormas: Map<string, ITipoNorma>;
-    private regexp: RegExp;
-    private interpretadorDispositivo = new InterpretadorReferencia();
+    /**
+     * Índice de normas organizados por tipo ou sigla.
+     */
+    private readonly hashNormas: Map<string, ITipoNorma>;
 
+    /**
+     * Expressão regular para encontrar normas.
+     */
+    private readonly regexp: RegExp;
+
+    /**
+     * Interpretador de referência de dispositivos.
+     */
+    private readonly interpretadorDispositivo = new InterpretadorReferencia();
+
+    /**
+     * Constrói o interpretador de remissão.
+     *
+     * @param normas Tipos de normas conhecidos.
+     * @param opcoes Opções de interpretação.
+     */
     constructor(normas: ITipoNorma[], private opcoes: IInterpretadorRemissaoOpcoes = {}) {
         normas = [
             {
@@ -75,6 +118,13 @@ export default class InterpretadorRemissao {
         this.regexp = new RegExp(`${regexpInicio}${regexpNormas}(?:\\s*${regexpNumero}${regexpAno}?)?${regexpFinal}`, 'ig');
     }
 
+    /**
+     * Interpreta um texto, a fim de extrair as remissões com a referência
+     * precisa a dispositivos.
+     *
+     * @param entrada Texto em que se buscarão as remissões.
+     * @returns Remissões.
+     */
     public interpretar(entrada: string): IInterpretacaoRemissao[] {
         const remissoes = this.interpretarRessissaoNormas(entrada);
 
@@ -83,6 +133,13 @@ export default class InterpretadorRemissao {
         return remissoes;
     }
 
+    /**
+     * Interpreta um texto, a fim de extrair as remissões para normas, porém
+     * desconsiderando qualquer referência a dispositivo. Este é o primeiro
+     * passo para a identificação da remissão.
+     *
+     * @param entrada Texto em que se buscarão as remissões.
+     */
     private interpretarRessissaoNormas(entrada: string): IInterpretacaoRemissao[] {
         const resultado: IInterpretacaoRemissao[] = [];
 
@@ -119,6 +176,13 @@ export default class InterpretadorRemissao {
         return resultado;
     }
 
+    /**
+     * Interpreta referência a dispositivos para uma determinada remissão
+     * para norma.
+     *
+     * @param entrada Texto em que serão buscadas as remissões.
+     * @param remissao Remissão cuja referência será interpretada.
+     */
     private interpretarRemissaoDispositivos(entrada: string, remissao: IInterpretacaoRemissao): void {
         let idx = remissao.idx - 1;
 
@@ -154,6 +218,14 @@ export default class InterpretadorRemissao {
         }
     }
 
+    /**
+     *
+     * @param remissao Remissão cuja referência será incorporada.
+     * @param referencia Referência a incorporar na remissão.
+     * @param entrada Texto em que foi feita a interpretação.
+     * @param inicio Índice inicial do texto em que a referência foi encontrada.
+     * @param tamanho Tamanho da referência encontrada.
+     */
     private incorporarReferencia(remissao: IRemissao,
                                  referencia: IReferencia,
                                  entrada: string,
@@ -175,6 +247,14 @@ export default class InterpretadorRemissao {
         } as IReferenciaItem);
     }
 
+    /**
+     * Extrai o número do dispositivo referenciado.
+     *
+     * @param entrada Texto em que a referência foi interpretada.
+     * @param referencia Referência encontrada.
+     * @param obrigatorio Determina se a referência deve obrigatoriamente possuir um número.
+     * @returns Número do dispositivo.
+     */
     private extrairNumero(entrada: string,
                           referencia: IReferenciaEncontrada,
                           obrigatorio: boolean = true): string | undefined {

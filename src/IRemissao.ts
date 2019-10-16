@@ -10,7 +10,7 @@ export interface IReferenciaArtigo {
     texto: string;
     artigo: string;
     caput?: boolean;
-};
+}
 
 export interface IReferenciaParagrafo extends IReferenciaArtigo {
     paragrafo: string;
