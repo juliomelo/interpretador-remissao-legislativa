@@ -26,7 +26,7 @@ describe('InterpretadorRemissao', () => {
         const texto = 'Testando o art. 225. Veja a Lei nº 6.763, de 26 de dezembro de 1975.';
         const resultado = interpretador.interpretar(texto);
 
-        expect(resultado[0].remissao.referencia).toBe(undefined);
+        expect(resultado.externas[0].remissao.referencias).toEqual([]);
     });
 
     it('Deve interpretar remissões do Decreto com Numeração Especial 471 de 23/09/2019', () => {

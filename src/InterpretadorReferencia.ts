@@ -36,8 +36,12 @@ export default class InterpretadorReferencia {
      *
      * @param entrada Texto de cuja referência será extraída.
      * @param idx Índice do texto de onde a interpretação iniciará.
+     * @param callback Método chamado ao encontrar uma referência.
+     * @returns Índice da última posição verificada.
      */
-    public *interpretarReverso(entrada: string, idx: number): IterableIterator<IReferenciaEncontrada> {
+    public interpretarReversamente(entrada: string,
+                                   idx: number,
+                                   callback: CallbackReferencia): number {
         const espaco = /\s|,/;
         const final = /[.:;!?()[\]{}]/;
         let atravessador = this.interpretador.criarAtravessador();
@@ -55,11 +59,11 @@ export default class InterpretadorReferencia {
             if (espaco.test(letra) || final.test(letra)) {
                 // Se temos um nó atual, então é um casamento!
                 if (atravessador.noAtual && atravessador.noAtual.item) {
-                    yield {
+                    callback({
                         tipo: atravessador.noAtual.item!,
                         idx: idx + 1,
                         tamanho: atravessador.contador
-                    };
+                    });
 
                     finalizado = false;
                     desencontros = 0;
@@ -82,6 +86,8 @@ export default class InterpretadorReferencia {
                 idx--;
             }
         } while (idx >= 0 && !(finalizado && !atravessador.noAtual) && this.limiteDesencontros >= desencontros);
+
+        return idx;
     }
 
     /**
@@ -101,7 +107,7 @@ export default class InterpretadorReferencia {
 }
 
 /**
- * Resultado da interpretação de referência.
+ * Localização da referência na entrada.
  *
  * @author Júlio César e Melo
  */
@@ -110,3 +116,5 @@ export interface IReferenciaEncontrada {
     idx: number;
     tamanho: number;
 }
+
+export type CallbackReferencia = (referencia: IReferenciaEncontrada) => void;

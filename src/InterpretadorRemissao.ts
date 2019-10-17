@@ -1,5 +1,6 @@
 import InterpretadorReferencia, { IReferenciaEncontrada } from './InterpretadorReferencia';
-import IRemissao, { IReferenciaItem } from './IRemissao';
+// tslint:disable-next-line: max-line-length
+import IRemissao, { IReferenciaAlinea, IReferenciaArtigo, IReferenciaInciso, IReferenciaItem, IReferenciaParagrafo } from './IRemissao';
 import ITipoNorma from './ITipoNorma';
 import { TipoReferencia, TiposReferencia } from './TipoReferencia';
 import constituicao from './tiposNormas/constituicao';
@@ -7,7 +8,9 @@ import constituicao from './tiposNormas/constituicao';
 /**
  * Resultado da interpretação da remissão.
  */
-export interface IInterpretacaoRemissao {
+export type IInterpretacaoRemissaoExterna = IResultadoInterpretacao<IRemissao>;
+
+export interface IResultadoInterpretacao<T> {
     /**
      * Índice da remissão no texto.
      */
@@ -16,13 +19,13 @@ export interface IInterpretacaoRemissao {
     /**
      * Remissão identificada.
      */
-    remissao: IRemissao;
+    remissao: T;
 }
 
-/**
- * Índice de referências de dispositivos organizados por tipo de dispositivo.
- */
-export type IReferencia = { [tipo in TiposReferencia]?: IReferenciaEncontrada };
+export interface IInterpretacaoRemissoes {
+    internas: IResultadoInterpretacao<IReferenciaArtigo>[];
+    externas: IInterpretacaoRemissaoExterna[];
+}
 
 /**
  * Opções para interpretação.
@@ -94,12 +97,16 @@ export default class InterpretadorRemissao {
      * @param entrada Texto em que se buscarão as remissões.
      * @returns Remissões.
      */
-    public interpretar(entrada: string): IInterpretacaoRemissao[] {
+    public interpretar(entrada: string): IInterpretacaoRemissoes {
         const remissoes = this.interpretarRessissaoNormas(entrada);
+        const idxRefs = remissoes.map(remissao => this.interpretarRemissaoDispositivosDeNormas(entrada, remissao))
+            .filter(idxRef => idxRef !== null) as ITrecho[];
+        const remissoesInternas = this.interpretarRemissoesInternas(entrada, idxRefs);
 
-        remissoes.forEach(remissao => this.interpretarRemissaoDispositivosDeNormas(entrada, remissao));
-
-        return remissoes;
+        return {
+            externas: remissoes,
+            internas: remissoesInternas
+        };
     }
 
     /**
@@ -109,8 +116,8 @@ export default class InterpretadorRemissao {
      *
      * @param entrada Texto em que se buscarão as remissões.
      */
-    private interpretarRessissaoNormas(entrada: string): IInterpretacaoRemissao[] {
-        const resultado: IInterpretacaoRemissao[] = [];
+    private interpretarRessissaoNormas(entrada: string): IInterpretacaoRemissaoExterna[] {
+        const resultado: IInterpretacaoRemissaoExterna[] = [];
 
         for (let m = this.regexp.exec(entrada); m; m = this.regexp.exec(entrada)) {
             const [casamento, mInicio, mTipoNorma, mNumero, mAno, mFinal] = m;
@@ -127,7 +134,8 @@ export default class InterpretadorRemissao {
                             tipo,
                             numero: parseInt(mNumero.replace(/\./g, ''), 10),
                             ano: parseInt(mAno, 10)
-                        }
+                        },
+                        referencias: []
                     }
                 });
             } else if (tipo.semNumero) {
@@ -137,7 +145,8 @@ export default class InterpretadorRemissao {
                         texto,
                         identificador: {
                             tipo
-                        }
+                        },
+                        referencias: []
                     }
                 });
             }
@@ -154,79 +163,138 @@ export default class InterpretadorRemissao {
      * @param entrada Texto em que serão buscadas as remissões.
      * @param remissao Remissão cuja referência será interpretada.
      */
-    private interpretarRemissaoDispositivosDeNormas(entrada: string, remissao: IInterpretacaoRemissao): void {
+    private interpretarRemissaoDispositivosDeNormas(entrada: string,
+                                                    remissao: IInterpretacaoRemissaoExterna): ITrecho | null {
         let idx = remissao.idx - 1;
 
         if (idx < 0) {
-            return;
+            return null;
         }
 
-        const referencia: IReferencia = {};
+        let referencia: IHashReferencia = {};
         let inicio = idx;
         let final = -1;
 
-        for (const item of this.interpretadorDispositivo.interpretarReverso(entrada, idx)) {
+        this.interpretadorDispositivo.interpretarReversamente(entrada, idx, item => {
             if (item.tipo in referencia) {
                 console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
                 const tamanho = this.opcoes.segmentarDispositivo
                     ? entrada.indexOf(' ', final + 1) - inicio
                     : idx - inicio + 1;
-                this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, tamanho);
+                remissao.remissao.referencias.unshift(this.criarReferencia(referencia, entrada, inicio, tamanho));
                 idx = inicio - 1;
                 final = -1;
+                referencia = {};
             }
 
             referencia[item.tipo] = item;
             inicio = Math.min(inicio, item.idx);
             final = Math.max(final, item.idx + item.tamanho);
-        }
+        });
 
         if (inicio !== idx) {
             const tamanho = this.opcoes.segmentarDispositivo
                 ? entrada.indexOf(' ', final + 1) - inicio
                 : idx - inicio + 1;
-            this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, tamanho);
+            remissao.remissao.referencias.unshift(this.criarReferencia(referencia, entrada, inicio, tamanho));
         }
+
+        return {inicio, final: remissao.idx + remissao.remissao.texto.length};
     }
 
     /**
-     *
-     * @param remissao Remissão cuja referência será incorporada.
+     * Cria a referência para u
      * @param referencia Referência a incorporar na remissão.
      * @param entrada Texto em que foi feita a interpretação.
      * @param inicio Índice inicial do texto em que a referência foi encontrada.
      * @param tamanho Tamanho da referência encontrada.
      */
-    private incorporarReferencia(remissao: IRemissao,
-                                 referencia: IReferencia,
-                                 entrada: string,
-                                 inicio: number,
-                                 tamanho: number) {
-        if (!remissao.referencia) {
-            remissao.referencia = [];
+    private criarReferencia(referencia: IHashReferencia,
+                            entrada: string,
+                            inicio: number,
+                            tamanho: number):
+                IReferenciaArtigo | IReferenciaParagrafo | IReferenciaInciso | IReferenciaAlinea | IReferenciaItem {
+        const texto = entrada.substr(inicio, tamanho);
+
+        return {
+            artigo: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ARTIGO]),
+            paragrafo: this.extrairNumero(texto, inicio, referencia[TipoReferencia.PARAGRAFO], false),
+            // tslint:disable-next-line: max-line-length
+            inciso: this.extrairNumero(texto, inicio, referencia[TipoReferencia.INCISO], TipoReferencia.ALINEA in referencia),
+            // tslint:disable-next-line: max-line-length
+            alinea: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ALINEA], TipoReferencia.ITEM in referencia),
+            item: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ITEM], false),
+            texto
+        } as IReferenciaItem;
+    }
+
+    private interpretarRemissoesInternas(entrada: string,
+                                         trechosAIgnorar: ITrecho[]): IResultadoInterpretacao<IReferenciaArtigo>[] {
+        trechosAIgnorar.sort((a, b) => a.inicio - b.inicio);
+
+        let idx = entrada.length - 1;
+        let ignorar = trechosAIgnorar.pop();
+
+        const deveIgnorar = (i: number) => {
+            while (ignorar && i < ignorar.inicio) {
+                ignorar = trechosAIgnorar.pop();
+            }
+
+            return ignorar && i >= ignorar.inicio && i <= ignorar.final;
+        };
+
+        const resultado: IResultadoInterpretacao<IReferenciaArtigo>[] = [];
+
+        while (idx >= 0) {
+            let referencia: IHashReferencia = {};
+            let inicio = idx;
+            let final = -1;
+
+            const novoIdx = this.interpretadorDispositivo.interpretarReversamente(entrada, idx, item => {
+                if (!deveIgnorar(item.idx)) {
+                    if (item.tipo in referencia) {
+                        console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
+                        const tamanho = idx - inicio + 1;
+                        resultado.unshift({
+                            idx: inicio,
+                            remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
+                        });
+                        idx = inicio - 1;
+                        final = -1;
+                        referencia = {};
+                    }
+
+                    referencia[item.tipo] = item;
+                    inicio = Math.min(inicio, item.idx);
+                    final = Math.max(final, item.idx + item.tamanho);
+                }
+            });
+
+            if (inicio !== idx) {
+                const tamanho = idx - inicio + 1;
+                resultado.unshift({
+                    idx: inicio,
+                    remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
+                });
+            }
+
+            idx = novoIdx;
         }
 
-        remissao.referencia.unshift({
-            artigo: this.extrairNumero(entrada, referencia[TipoReferencia.ARTIGO]),
-            paragrafo: this.extrairNumero(entrada, referencia[TipoReferencia.PARAGRAFO], false),
-            // tslint:disable-next-line: max-line-length
-            inciso: this.extrairNumero(entrada, referencia[TipoReferencia.INCISO], TipoReferencia.ALINEA in referencia),
-            // tslint:disable-next-line: max-line-length
-            alinea: this.extrairNumero(entrada, referencia[TipoReferencia.ALINEA], TipoReferencia.ITEM in referencia),
-            item: this.extrairNumero(entrada, referencia[TipoReferencia.ITEM], false),
-            texto: entrada.substr(inicio, tamanho)
-        } as IReferenciaItem);
+        return resultado;
     }
 
     /**
      * Extrai o número do dispositivo referenciado.
      *
-     * @param entrada Texto em que a referência foi interpretada.
+     * @param trecho Texto em que a referência foi interpretada.
+     * @param inicio Índice da posição de trecho na entrada.
      * @param referencia Referência encontrada.
      * @param obrigatorio Determina se a referência deve obrigatoriamente possuir um número.
      * @returns Número do dispositivo.
      */
-    private extrairNumero(entrada: string,
+    private extrairNumero(trecho: string,
+                          inicio: number,
                           referencia: IReferenciaEncontrada | undefined,
                           obrigatorio: boolean = true): string | undefined {
         if (!referencia) {
@@ -238,26 +306,36 @@ export default class InterpretadorRemissao {
         }
 
         const espaco = /\s|,/;
-        let idx = referencia.idx + referencia.tamanho;
+        let idx = referencia.idx - inicio + referencia.tamanho;
 
-        while (idx < entrada.length && espaco.test(entrada.charAt(idx))) {
+        while (idx < trecho.length && espaco.test(trecho.charAt(idx))) {
             idx++;
         }
 
         let ultimoIdx = idx + 1;
 
-        while (ultimoIdx < entrada.length && !espaco.test(entrada.charAt(ultimoIdx))) {
+        while (ultimoIdx < trecho.length && !espaco.test(trecho.charAt(ultimoIdx))) {
             ultimoIdx++;
         }
 
-        if (ultimoIdx >= entrada.length) {
+        if (ultimoIdx === idx) {
             if (obrigatorio) {
                 throw new Error(`Referência incompleta.`);
             }
 
             return undefined;
         } else {
-            return entrada.substr(idx, ultimoIdx - idx).replace(/[\u2018\u2019\u201C\u201D'"]/g, '');
+            return trecho.substr(idx, ultimoIdx - idx).replace(/[\u2018\u2019\u201C\u201D'"]/g, '');
         }
     }
+}
+
+/**
+ * Índice de referências de dispositivos organizados por tipo de dispositivo.
+ */
+type IHashReferencia = { [tipo in TiposReferencia]?: IReferenciaEncontrada };
+
+interface ITrecho {
+    inicio: number;
+    final: number;
 }
