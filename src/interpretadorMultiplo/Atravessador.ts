@@ -1,5 +1,10 @@
 import { INo } from './INo';
 
+/**
+ * Classe que permite caminhar pela árvore.
+ *
+ * @author Júlio César e Melo
+ */
 export default class Atravessador<TItem> {
     private no?: INo<TItem>;
     private $contador = 0;
@@ -8,6 +13,13 @@ export default class Atravessador<TItem> {
         this.no = raiz;
     }
 
+    /**
+     * Caminha na árvore a partir da próxima letra.
+     *
+     * @param letra Letra por onde se deve caminhar.
+     * @returns Nó referente à letra, novo nó (se construtor for verdadeiro)
+     * ou undefined.
+     */
     public caminhar(letra: string): INo<TItem> | undefined {
         this.$contador++;
 

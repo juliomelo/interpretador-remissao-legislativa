@@ -1,6 +1,8 @@
-import InterpretadorReferencia, { IReferenciaEncontrada, TipoReferencia } from './InterpretadorReferencia';
+import InterpretadorReferencia, { IReferenciaEncontrada } from './InterpretadorReferencia';
 import IRemissao, { IReferenciaItem } from './IRemissao';
 import ITipoNorma from './ITipoNorma';
+import { TipoReferencia, TiposReferencia } from './TipoReferencia';
+import constituicao from './tiposNormas/constituicao';
 
 /**
  * Resultado da interpretação da remissão.
@@ -20,9 +22,7 @@ export interface IInterpretacaoRemissao {
 /**
  * Índice de referências de dispositivos organizados por tipo de dispositivo.
  */
-export interface IReferencia {
-    [tipo: string]: IReferenciaEncontrada;
-}
+export type IReferencia = { [tipo in TiposReferencia]?: IReferenciaEncontrada };
 
 /**
  * Opções para interpretação.
@@ -64,38 +64,7 @@ export default class InterpretadorRemissao {
      * @param opcoes Opções de interpretação.
      */
     constructor(normas: ITipoNorma[], private opcoes: IInterpretadorRemissaoOpcoes = {}) {
-        normas = [
-            {
-                ambito: 'Federal',
-                tipo: 'Constituição Federal',
-                sigla: 'CF',
-                semNumero: true
-            },
-            {
-                ambito: 'Federal',
-                tipo: 'Constituição da República Federativa do Brasil',
-                sigla: 'CRFB',
-                semNumero: true
-            },
-            {
-                ambito: 'Estadual',
-                tipo: 'Constituição do Estado',
-                sigla: 'CE',
-                semNumero: true
-            },
-            {
-                ambito: 'Federal',
-                tipo: 'Constituição Estadual',
-                sigla: 'CE',
-                semNumero: true
-            },
-            {
-                ambito: 'Municipal',
-                tipo: 'Lei Orgânica',
-                sigla: 'LO',
-                semNumero: true
-            },
-            ...normas];
+        normas = [...constituicao, ...normas];
         this.hashNormas = new Map();
 
         for (const norma of normas) {
@@ -128,7 +97,7 @@ export default class InterpretadorRemissao {
     public interpretar(entrada: string): IInterpretacaoRemissao[] {
         const remissoes = this.interpretarRessissaoNormas(entrada);
 
-        remissoes.forEach(remissao => this.interpretarRemissaoDispositivos(entrada, remissao));
+        remissoes.forEach(remissao => this.interpretarRemissaoDispositivosDeNormas(entrada, remissao));
 
         return remissoes;
     }
@@ -144,19 +113,20 @@ export default class InterpretadorRemissao {
         const resultado: IInterpretacaoRemissao[] = [];
 
         for (let m = this.regexp.exec(entrada); m; m = this.regexp.exec(entrada)) {
-            const tipo = this.hashNormas.get(m[2].trim().toLowerCase())!;
-            const idx = m.index + m[1].length;
-            const texto = m[0].substr(m[1].length, m[0].length - m[1].length - m[5].length);
+            const [casamento, mInicio, mTipoNorma, mNumero, mAno, mFinal] = m;
+            const tipo = this.hashNormas.get(mTipoNorma.trim().toLowerCase())!;
+            const idx = m.index + mInicio.length;
+            const texto = casamento.substr(mInicio.length, casamento.length - mInicio.length - mFinal.length);
 
-            if (m[3]) {
+            if (mNumero) {
                 resultado.push({
                     idx,
                     remissao: {
                         texto,
                         identificador: {
                             tipo,
-                            numero: parseInt(m[3].replace(/\./g, ''), 10),
-                            ano: parseInt(m[4], 10)
+                            numero: parseInt(mNumero.replace(/\./g, ''), 10),
+                            ano: parseInt(mAno, 10)
                         }
                     }
                 });
@@ -178,12 +148,13 @@ export default class InterpretadorRemissao {
 
     /**
      * Interpreta referência a dispositivos para uma determinada remissão
-     * para norma.
+     * para norma. Este método completa as informações da remissão para
+     * norma interpretada anteriormente.
      *
      * @param entrada Texto em que serão buscadas as remissões.
      * @param remissao Remissão cuja referência será interpretada.
      */
-    private interpretarRemissaoDispositivos(entrada: string, remissao: IInterpretacaoRemissao): void {
+    private interpretarRemissaoDispositivosDeNormas(entrada: string, remissao: IInterpretacaoRemissao): void {
         let idx = remissao.idx - 1;
 
         if (idx < 0) {
@@ -212,8 +183,8 @@ export default class InterpretadorRemissao {
 
         if (inicio !== idx) {
             const tamanho = this.opcoes.segmentarDispositivo
-                    ? entrada.indexOf(' ', final + 1) - inicio
-                    : idx - inicio + 1;
+                ? entrada.indexOf(' ', final + 1) - inicio
+                : idx - inicio + 1;
             this.incorporarReferencia(remissao.remissao, referencia, entrada, inicio, tamanho);
         }
     }
@@ -256,7 +227,7 @@ export default class InterpretadorRemissao {
      * @returns Número do dispositivo.
      */
     private extrairNumero(entrada: string,
-                          referencia: IReferenciaEncontrada,
+                          referencia: IReferenciaEncontrada | undefined,
                           obrigatorio: boolean = true): string | undefined {
         if (!referencia) {
             if (obrigatorio) {

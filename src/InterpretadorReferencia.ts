@@ -1,4 +1,6 @@
 import { InterpretadorMultiplo } from './interpretadorMultiplo/InterpretadorMultiplo';
+import partes from './partes';
+import { TipoReferencia } from './TipoReferencia';
 
 /**
  * Interpreta referência de dispositivo.
@@ -17,56 +19,6 @@ export default class InterpretadorReferencia {
     private readonly limiteDesencontros = 4;
 
     constructor() {
-        const partes: {
-            tipo: TipoReferencia,
-            expressao: string[]
-        }[] = [
-                {
-                    tipo: TipoReferencia.ARTIGO,
-                    expressao: ['art', 'art.', 'artigo']
-                },
-                {
-                    tipo: TipoReferencia.CAPUT,
-                    expressao: ['caput']
-                },
-                {
-                    tipo: TipoReferencia.PARAGRAFO,
-                    expressao: ['parágrafo', 'paragrafo', '§', 'parág.', 'parag.']
-                },
-                {
-                    tipo: TipoReferencia.INCISO,
-                    expressao: ['inc', 'inc.', 'inciso']
-                },
-                {
-                    tipo: TipoReferencia.ALINEA,
-                    expressao: ['ali', 'ali.', 'alínea', 'alinea']
-                },
-                {
-                    tipo: TipoReferencia.ITEM,
-                    expressao: ['ite', 'item']
-                },
-                {
-                    tipo: TipoReferencia.SUBSECAO,
-                    expressao: ['subseção', 'subsecao', 'subsec', 'subsec.']
-                },
-                {
-                    tipo: TipoReferencia.SECAO,
-                    expressao: ['secao', 'sec.', 'sec']
-                },
-                {
-                    tipo: TipoReferencia.CAPITULO,
-                    expressao: ['capítulo', 'capitulo', 'cap.', 'cap']
-                },
-                {
-                    tipo: TipoReferencia.TITULO,
-                    expressao: ['título', 'titulo', 'tit.', 'tit']
-                },
-                {
-                    tipo: TipoReferencia.PREAMBULO,
-                    expressao: ['preambulo', 'preâmbulo', 'pré-âmbulo', 'pre-ambulo', 'préâmbulo', 'préambulo']
-                }
-            ];
-
         // Configura parser reverso (de trás para frente).
         partes.forEach(parte => {
             parte.expressao.forEach(expressao => this.interpretador.adicionar(this.inverter(expressao), parte.tipo));
@@ -146,20 +98,6 @@ export default class InterpretadorReferencia {
 
         return resultado;
     }
-}
-
-export enum TipoReferencia {
-    ARTIGO = 'artigo',
-    CAPUT = 'caput',
-    INCISO = 'inciso',
-    ALINEA = 'alinea',
-    ITEM = 'item',
-    PARAGRAFO = 'paragrafo',
-    TITULO = 'titulo',
-    CAPITULO = 'capitulo',
-    SECAO = 'secao',
-    SUBSECAO = 'subsecao',
-    PREAMBULO = 'preambulo'
 }
 
 /**
