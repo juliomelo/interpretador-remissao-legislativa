@@ -1,4 +1,4 @@
-import InterpretadorReferencia, { IReferenciaEncontrada } from './InterpretadorReferencia';
+import InterpretadorReferencia, { IReferenciaEncontrada, REGEXP_ESPACO, REGXP_FINAL as REGEXP_FINAL } from './InterpretadorReferencia';
 // tslint:disable-next-line: max-line-length
 import IRemissao, { IReferenciaAlinea, IReferenciaArtigo, IReferenciaInciso, IReferenciaItem, IReferenciaParagrafo } from './IRemissao';
 import ITipoNorma from './ITipoNorma';
@@ -178,10 +178,16 @@ export default class InterpretadorRemissao {
         this.interpretadorDispositivo.interpretarReversamente(entrada, idx, item => {
             if (item.tipo in referencia) {
                 console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
-                const tamanho = this.opcoes.segmentarDispositivo
-                    ? entrada.indexOf(' ', final + 1) - inicio
-                    : idx - inicio + 1;
-                remissao.remissao.referencias.unshift(this.criarReferencia(referencia, entrada, inicio, tamanho));
+
+                const tamanho = (this.opcoes.segmentarDispositivo
+                    ? this.encontrarFinalTrecho(entrada, final)
+                    : idx) - inicio + 1;
+
+                remissao.remissao.referencias.unshift(
+                    this.criarReferencia(referencia, entrada, inicio, tamanho)
+                );
+
+                // Reinicia o contexto.
                 idx = inicio - 1;
                 final = -1;
                 referencia = {};
@@ -193,21 +199,41 @@ export default class InterpretadorRemissao {
         });
 
         if (inicio !== idx) {
-            const tamanho = this.opcoes.segmentarDispositivo
-                ? entrada.indexOf(' ', final + 1) - inicio
-                : idx - inicio + 1;
-            remissao.remissao.referencias.unshift(this.criarReferencia(referencia, entrada, inicio, tamanho));
+            const tamanho = (this.opcoes.segmentarDispositivo
+                    ? this.encontrarFinalTrecho(entrada, final)
+                    : idx) - inicio + 1;
+
+            remissao.remissao.referencias.unshift(
+                this.criarReferencia(referencia, entrada, inicio, tamanho)
+            );
         }
 
         return {inicio, final: remissao.idx + remissao.remissao.texto.length};
     }
 
+    private encontrarFinalTrecho(entrada: string, idx: number): number {
+        if (!REGEXP_FINAL.test(entrada.charAt(idx))) {
+            idx++;
+        }
+
+        let letra = entrada.charAt(idx);
+
+        while (!REGEXP_FINAL.test(letra) && !REGEXP_ESPACO.test(letra)) {
+            letra = entrada.charAt(++idx);
+        }
+
+        return idx - 1;
+    }
+
     /**
-     * Cria a referência para u
+     * Cria a referência para um dispositivo interpretado.
+     * 
      * @param referencia Referência a incorporar na remissão.
      * @param entrada Texto em que foi feita a interpretação.
      * @param inicio Índice inicial do texto em que a referência foi encontrada.
      * @param tamanho Tamanho da referência encontrada.
+     * @param segmentar Determina se a interpretação deve extrair apenas o segmento que
+     * referencia o dispositivo ou extrair todo o texto até a remissão.
      */
     private criarReferencia(referencia: IHashReferencia,
                             entrada: string,
@@ -254,11 +280,15 @@ export default class InterpretadorRemissao {
                 if (!deveIgnorar(item.idx)) {
                     if (item.tipo in referencia) {
                         console.debug(`Referência ${item.tipo} repetida em ${item.idx}.`);
-                        const tamanho = idx - inicio + 1;
+
+                        const tamanho = this.encontrarFinalTrecho(entrada, final) - inicio + 1;
+
                         resultado.unshift({
                             idx: inicio,
                             remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
                         });
+
+                        // Reinicia o contexto.
                         idx = inicio - 1;
                         final = -1;
                         referencia = {};
@@ -271,7 +301,8 @@ export default class InterpretadorRemissao {
             });
 
             if (inicio !== idx) {
-                const tamanho = idx - inicio + 1;
+                const tamanho = this.encontrarFinalTrecho(entrada, final) - inicio + 1;
+
                 resultado.unshift({
                     idx: inicio,
                     remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)

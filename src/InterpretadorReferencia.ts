@@ -2,6 +2,9 @@ import { InterpretadorMultiplo } from './interpretadorMultiplo/InterpretadorMult
 import partes from './partes';
 import { TipoReferencia } from './TipoReferencia';
 
+export const REGEXP_ESPACO = /[\s,]/;
+export const REGXP_FINAL = /[.:;!?()[\]{}]/;
+
 /**
  * Interpreta referência de dispositivo.
  *
@@ -42,21 +45,19 @@ export default class InterpretadorReferencia {
     public interpretarReversamente(entrada: string,
                                    idx: number,
                                    callback: CallbackReferencia): number {
-        const espaco = /\s|,/;
-        const final = /[.:;!?()[\]{}]/;
         let atravessador = this.interpretador.criarAtravessador();
         let letra: string;
         let finalizado = false;
         let desencontros = 0;
 
-        while (idx >= 0 && espaco.test(entrada.charAt(idx))) {
+        while (idx >= 0 && REGEXP_ESPACO.test(entrada.charAt(idx))) {
             idx--;
         }
 
         do {
             letra = entrada.charAt(idx);
 
-            if (espaco.test(letra) || final.test(letra)) {
+            if (REGEXP_ESPACO.test(letra) || REGXP_FINAL.test(letra)) {
                 // Se temos um nó atual, então é um casamento!
                 if (atravessador.noAtual && atravessador.noAtual.item) {
                     callback({
@@ -77,9 +78,9 @@ export default class InterpretadorReferencia {
                     atravessador = this.interpretador.criarAtravessador();
 
                     do {
-                        finalizado = finalizado || final.test(entrada.charAt(idx));
+                        finalizado = finalizado || REGXP_FINAL.test(entrada.charAt(idx));
                         idx--;
-                    } while (idx >= 0 && espaco.test(entrada.charAt(idx)));
+                    } while (idx >= 0 && REGEXP_ESPACO.test(entrada.charAt(idx)));
                 }
             } else {
                 atravessador.caminhar(letra);
