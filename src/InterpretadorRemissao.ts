@@ -1,3 +1,4 @@
+// tslint:disable-next-line: max-line-length
 import InterpretadorReferencia, { IReferenciaEncontrada, REGEXP_ESPACO, REGXP_FINAL as REGEXP_FINAL } from './InterpretadorReferencia';
 // tslint:disable-next-line: max-line-length
 import IRemissao, { IReferenciaAlinea, IReferenciaArtigo, IReferenciaInciso, IReferenciaItem, IReferenciaParagrafo } from './IRemissao';
@@ -6,11 +7,16 @@ import { TipoReferencia, TiposReferencia } from './TipoReferencia';
 import constituicao from './tiposNormas/constituicao';
 
 /**
- * Resultado da interpretação da remissão.
+ * Resultado da interpretação de remissão para outras normas.
  */
 export type IInterpretacaoRemissaoExterna = IResultadoInterpretacao<IRemissao>;
 
-export interface IResultadoInterpretacao<T> {
+/**
+ * Resultado da interpretação de remissão para dispositivos internos.
+ */
+export type IInterpretacaoRemissaoInterna = IResultadoInterpretacao<IReferenciaArtigo>;
+
+interface IResultadoInterpretacao<T> {
     /**
      * Índice da remissão no texto.
      */
@@ -22,8 +28,18 @@ export interface IResultadoInterpretacao<T> {
     remissao: T;
 }
 
+/**
+ * Resultado da interpretação de remissões.
+ */
 export interface IInterpretacaoRemissoes {
-    internas: IResultadoInterpretacao<IReferenciaArtigo>[];
+    /**
+     * Remissões para dispositivos no próprio documento.
+     */
+    internas: IInterpretacaoRemissaoInterna[];
+
+    /**
+     * Remissões para dispositivos em outros documentos.
+     */
     externas: IInterpretacaoRemissaoExterna[];
 }
 
@@ -227,7 +243,7 @@ export default class InterpretadorRemissao {
 
     /**
      * Cria a referência para um dispositivo interpretado.
-     * 
+     *
      * @param referencia Referência a incorporar na remissão.
      * @param entrada Texto em que foi feita a interpretação.
      * @param inicio Índice inicial do texto em que a referência foi encontrada.
@@ -255,7 +271,7 @@ export default class InterpretadorRemissao {
     }
 
     private interpretarRemissoesInternas(entrada: string,
-                                         trechosAIgnorar: ITrecho[]): IResultadoInterpretacao<IReferenciaArtigo>[] {
+                                         trechosAIgnorar: ITrecho[]): IInterpretacaoRemissaoInterna[] {
         trechosAIgnorar.sort((a, b) => a.inicio - b.inicio);
 
         let idx = entrada.length - 1;
@@ -269,7 +285,7 @@ export default class InterpretadorRemissao {
             return ignorar && i >= ignorar.inicio && i <= ignorar.final;
         };
 
-        const resultado: IResultadoInterpretacao<IReferenciaArtigo>[] = [];
+        const resultado: IInterpretacaoRemissaoInterna[] = [];
 
         while (idx >= 0) {
             let referencia: IHashReferencia = {};
