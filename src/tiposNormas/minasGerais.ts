@@ -1,168 +1,201 @@
-import ITipoNorma from '../ITipoNorma';
+import ITipoNorma, { Autoridade } from './ITipoNorma';
 
 export default [
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Ato das Disposições Constitucionais Transitórias',
         sigla: 'ADT'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Constituição',
         sigla: 'CON'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decisão Conjunta',
         sigla: 'DCJ'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decisão da Mesa',
         sigla: 'DCM'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decisão da Presidência',
         sigla: 'DPR'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decisão da Primeira-Secretaria',
         sigla: 'DEP'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decisão Normativa da Presidência',
         sigla: 'DNP'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decreto',
         sigla: 'DEC'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decreto com numeração especial',
         sigla: 'DNE'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decreto sem Número',
         sigla: 'DSN'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Decreto-Lei',
         sigla: 'DEL'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Deliberação',
         sigla: 'DLB'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Emenda à Constituição',
         sigla: 'EMC'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Instrução Normativa da Diretoria-Geral',
         sigla: 'IDG'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Lei',
         sigla: 'LEI'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Lei Adicional',
         sigla: 'LEA'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Lei Complementar',
         sigla: 'LCP'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Lei Constitucional',
         sigla: 'LCO'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Lei Delegada',
         sigla: 'LDL'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Ordem de Serviço',
         sigla: 'OSV'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Ordem de Serviço da Presidência, da Primeira-Secretaria e da Diretoria',
         sigla: 'OSP'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Ordem de Serviço da Presidência e da Primeira-Secretaria',
         sigla: 'OPP'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Ordem de Serviço da Primeira-Secretaria e da Diretoria-Geral',
         sigla: 'OPD'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria',
         sigla: 'PRT'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Diretoria-Geral',
         sigla: 'PDG'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Presidência',
         sigla: 'PPR'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Presidência, da Primeira-Secretaria e da Diretoria-Geral',
         sigla: 'PPD'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Presidência e da Diretoria-Geral',
         sigla: 'PPG'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Presidência e da Primeira-Secretaria',
         sigla: 'PPS'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria da Primeira-Secretaria e da Diretoria-Geral',
         sigla: 'PSD'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Portaria sem Número',
         sigla: 'PSN'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Resolução',
         sigla: 'RAL'
     },
     {
-        ambito: 'Minas Gerais',
+        local: 'br;minas.gerais',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Resolução Sem Número',
         sigla: 'RSN'
     }

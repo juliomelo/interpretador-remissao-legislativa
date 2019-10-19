@@ -10,7 +10,8 @@ Object {
           "ano": 1975,
           "numero": 6763,
           "tipo": Object {
-            "ambito": "Minas Gerais",
+            "autoridade": "estadual",
+            "local": "br;minas.gerais",
             "sigla": "LEI",
             "tipo": "Lei",
           },
@@ -19,6 +20,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "225",
+            "idx": 2,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "6º",
@@ -43,7 +45,8 @@ Object {
           "ano": 1975,
           "numero": 6763,
           "tipo": Object {
-            "ambito": "Minas Gerais",
+            "autoridade": "estadual",
+            "local": "br;minas.gerais",
             "sigla": "LEI",
             "tipo": "Lei",
           },
@@ -52,6 +55,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "225",
+            "idx": 2,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "6º",
@@ -85,6 +89,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 56,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -99,7 +104,7 @@ Object {
       "remissao": Object {
         "identificador": Object {
           "tipo": Object {
-            "ambito": "Estadual",
+            "autoridade": "estadual",
             "semNumero": true,
             "sigla": "CE",
             "tipo": "Constituição do Estado",
@@ -109,6 +114,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "90",
+            "idx": 374,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -134,6 +140,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 453,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -142,6 +149,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "14",
+            "idx": 494,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "3º",
@@ -167,6 +175,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 658,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -192,6 +201,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "14",
+            "idx": 1153,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "3º",
@@ -208,6 +218,7 @@ Object {
       "remissao": Object {
         "alinea": undefined,
         "artigo": "1º",
+        "idx": 1333,
         "inciso": undefined,
         "item": undefined,
         "paragrafo": undefined,
@@ -237,6 +248,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 56,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -251,7 +263,7 @@ Object {
       "remissao": Object {
         "identificador": Object {
           "tipo": Object {
-            "ambito": "Estadual",
+            "autoridade": "estadual",
             "semNumero": true,
             "sigla": "CE",
             "tipo": "Constituição do Estado",
@@ -261,6 +273,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "90",
+            "idx": 374,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -286,6 +299,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 453,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -294,6 +308,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "14",
+            "idx": 494,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "3º",
@@ -319,6 +334,7 @@ Object {
           Object {
             "alinea": "b",
             "artigo": "3º",
+            "idx": 658,
             "inciso": "VII",
             "item": undefined,
             "paragrafo": undefined,
@@ -344,6 +360,7 @@ Object {
           Object {
             "alinea": undefined,
             "artigo": "14",
+            "idx": 1153,
             "inciso": undefined,
             "item": undefined,
             "paragrafo": "3º",
@@ -360,6 +377,7 @@ Object {
       "remissao": Object {
         "alinea": undefined,
         "artigo": "1º",
+        "idx": 1333,
         "inciso": undefined,
         "item": undefined,
         "paragrafo": undefined,

@@ -1,9 +1,9 @@
 // tslint:disable-next-line: max-line-length
 import InterpretadorReferencia, { IReferenciaEncontrada, REGEXP_ESPACO, REGXP_FINAL as REGEXP_FINAL } from './InterpretadorReferencia';
 // tslint:disable-next-line: max-line-length
-import IRemissao, { IReferenciaAlinea, IReferenciaArtigo, IReferenciaInciso, IReferenciaItem, IReferenciaParagrafo } from './IRemissao';
-import ITipoNorma from './ITipoNorma';
+import IRemissao, { IReferencia } from './IRemissao';
 import { TipoReferencia, TiposReferencia } from './TipoReferencia';
+import todasNormas, { ITipoNorma } from './tiposNormas';
 import constituicao from './tiposNormas/constituicao';
 
 /**
@@ -14,7 +14,7 @@ export type IInterpretacaoRemissaoExterna = IResultadoInterpretacao<IRemissao>;
 /**
  * Resultado da interpretação de remissão para dispositivos internos.
  */
-export type IInterpretacaoRemissaoInterna = IResultadoInterpretacao<IReferenciaArtigo>;
+export type IInterpretacaoRemissaoInterna = IResultadoInterpretacao<IReferencia>;
 
 interface IResultadoInterpretacao<T> {
     /**
@@ -82,7 +82,7 @@ export default class InterpretadorRemissao {
      * @param normas Tipos de normas conhecidos.
      * @param opcoes Opções de interpretação.
      */
-    constructor(normas: ITipoNorma[], private opcoes: IInterpretadorRemissaoOpcoes = {}) {
+    constructor(normas: ITipoNorma[] = todasNormas, private opcoes: IInterpretadorRemissaoOpcoes = {}) {
         normas = [...constituicao, ...normas];
         this.hashNormas = new Map();
 
@@ -254,11 +254,11 @@ export default class InterpretadorRemissao {
     private criarReferencia(referencia: IHashReferencia,
                             entrada: string,
                             inicio: number,
-                            tamanho: number):
-                IReferenciaArtigo | IReferenciaParagrafo | IReferenciaInciso | IReferenciaAlinea | IReferenciaItem {
+                            tamanho: number): IReferencia {
         const texto = entrada.substr(inicio, tamanho);
 
         return {
+            idx: inicio,
             artigo: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ARTIGO]),
             paragrafo: this.extrairNumero(texto, inicio, referencia[TipoReferencia.PARAGRAFO], false),
             // tslint:disable-next-line: max-line-length
@@ -267,7 +267,7 @@ export default class InterpretadorRemissao {
             alinea: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ALINEA], TipoReferencia.ITEM in referencia),
             item: this.extrairNumero(texto, inicio, referencia[TipoReferencia.ITEM], false),
             texto
-        } as IReferenciaItem;
+        } as IReferencia;
     }
 
     private interpretarRemissoesInternas(entrada: string,

@@ -1,32 +1,34 @@
-import ITipoNorma from '../ITipoNorma';
+import ITipoNorma, { Autoridade } from './ITipoNorma';
 
 const normas: ITipoNorma[] = [
     {
-        ambito: 'Federal',
+        local: 'br',
+        autoridade: Autoridade.FEDERAL,
         tipo: 'Constituição Federal',
         sigla: 'CF',
         semNumero: true
     },
     {
-        ambito: 'Federal',
+        local: 'br',
+        autoridade: Autoridade.FEDERAL,
         tipo: 'Constituição da República Federativa do Brasil',
         sigla: 'CRFB',
         semNumero: true
     },
     {
-        ambito: 'Estadual',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Constituição do Estado',
         sigla: 'CE',
         semNumero: true
     },
     {
-        ambito: 'Federal',
+        autoridade: Autoridade.ESTADUAL,
         tipo: 'Constituição Estadual',
         sigla: 'CE',
         semNumero: true
     },
     {
-        ambito: 'Municipal',
+        autoridade: Autoridade.MUNICIPAL,
         tipo: 'Lei Orgânica',
         sigla: 'LO',
         semNumero: true

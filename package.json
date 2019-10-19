@@ -2,7 +2,7 @@
   "name": "@legispedia/interpretador-remissao-legislativa",
   "version": "1.0.0",
   "description": "Interpretador de Remissão Legislativa",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "npx jest"
   },

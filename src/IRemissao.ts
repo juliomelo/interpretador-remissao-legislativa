@@ -3,10 +3,11 @@ import IIdentificadorNorma from './IIdentificadorNorma';
 export default interface IRemissao {
     texto: string;
     identificador: IIdentificadorNorma;
-    referencias: IReferenciaArtigo[];
+    referencias: IReferencia[];
 }
 
 export interface IReferenciaArtigo {
+    idx: number;
     texto: string;
     artigo: string;
     caput?: boolean;
@@ -28,3 +29,6 @@ export interface IReferenciaAlinea extends IReferenciaInciso {
 export interface IReferenciaItem extends IReferenciaAlinea {
     item: string;
 }
+
+// tslint:disable-next-line: max-line-length
+export type IReferencia = IReferenciaArtigo | IReferenciaParagrafo | IReferenciaInciso | IReferenciaAlinea | IReferenciaItem;

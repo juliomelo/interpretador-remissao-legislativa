@@ -1,4 +1,4 @@
-import ITipoNorma from './ITipoNorma';
+import ITipoNorma from './tiposNormas/ITipoNorma';
 
 export default interface IIdentificadorNorma {
     tipo: ITipoNorma;
