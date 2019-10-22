@@ -1,6 +1,6 @@
+import ErroReferenciaIncompleta from './ErroReferenciaIncompleta';
 // tslint:disable-next-line: max-line-length
 import InterpretadorReferencia, { IReferenciaEncontrada, REGEXP_ESPACO, REGXP_FINAL as REGEXP_FINAL } from './InterpretadorReferencia';
-// tslint:disable-next-line: max-line-length
 import IRemissao, { IReferencia } from './IRemissao';
 import { TipoReferencia, TiposReferencia } from './TipoReferencia';
 import todasNormas, { ITipoNorma } from './tiposNormas';
@@ -199,9 +199,15 @@ export default class InterpretadorRemissao {
                     ? this.encontrarFinalTrecho(entrada, final)
                     : idx) - inicio + 1;
 
-                remissao.remissao.referencias.unshift(
-                    this.criarReferencia(referencia, entrada, inicio, tamanho)
-                );
+                try {
+                    remissao.remissao.referencias.unshift(
+                        this.criarReferencia(referencia, entrada, inicio, tamanho)
+                    );
+                } catch (e) {
+                    if (!(e instanceof ErroReferenciaIncompleta)) {
+                        throw e;
+                    }
+                }
 
                 // Reinicia o contexto.
                 idx = inicio - 1;
@@ -219,9 +225,15 @@ export default class InterpretadorRemissao {
                     ? this.encontrarFinalTrecho(entrada, final)
                     : idx) - inicio + 1;
 
-            remissao.remissao.referencias.unshift(
-                this.criarReferencia(referencia, entrada, inicio, tamanho)
-            );
+            try {
+                remissao.remissao.referencias.unshift(
+                    this.criarReferencia(referencia, entrada, inicio, tamanho)
+                );
+            } catch (e) {
+                if (!(e instanceof ErroReferenciaIncompleta)) {
+                    throw e;
+                }
+            }
         }
 
         return {inicio, final: remissao.idx + remissao.remissao.texto.length};
@@ -299,10 +311,16 @@ export default class InterpretadorRemissao {
 
                         const tamanho = this.encontrarFinalTrecho(entrada, final) - inicio + 1;
 
-                        resultado.unshift({
-                            idx: inicio,
-                            remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
-                        });
+                        try {
+                            resultado.unshift({
+                                idx: inicio,
+                                remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
+                            });
+                        } catch (e) {
+                            if (!(e instanceof ErroReferenciaIncompleta)) {
+                                throw e;
+                            }
+                        }
 
                         // Reinicia o contexto.
                         idx = inicio - 1;
@@ -319,10 +337,16 @@ export default class InterpretadorRemissao {
             if (inicio !== idx) {
                 const tamanho = this.encontrarFinalTrecho(entrada, final) - inicio + 1;
 
-                resultado.unshift({
-                    idx: inicio,
-                    remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
-                });
+                try {
+                    resultado.unshift({
+                        idx: inicio,
+                        remissao: this.criarReferencia(referencia, entrada, inicio, tamanho)
+                    });
+                } catch (e) {
+                    if (!(e instanceof ErroReferenciaIncompleta)) {
+                        throw e;
+                    }
+                }
             }
 
             idx = novoIdx;
@@ -346,7 +370,7 @@ export default class InterpretadorRemissao {
                           obrigatorio: boolean = true): string | undefined {
         if (!referencia) {
             if (obrigatorio) {
-                throw new Error(`Referência incompleta.`);
+                throw new ErroReferenciaIncompleta(trecho, inicio);
             }
 
             return undefined;
@@ -367,7 +391,7 @@ export default class InterpretadorRemissao {
 
         if (ultimoIdx === idx) {
             if (obrigatorio) {
-                throw new Error(`Referência incompleta.`);
+                throw new ErroReferenciaIncompleta(trecho, inicio);
             }
 
             return undefined;
